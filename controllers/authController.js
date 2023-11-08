@@ -74,7 +74,15 @@ export const login = async (req, res) => {
 // //Get user
 export const getUsers = async (req, res) => {
   try {
-  } catch (err) {}
+    const users = await UserSchema.find()
+
+    return res.json({users})
+  } catch (e) {
+    console.log(e)
+    res.status(400).json({
+      message: 'Get Users error',
+    })
+  }
 }
 // Update
 export const updateUser = async (req, res) => {
