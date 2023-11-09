@@ -2,6 +2,7 @@ import Router from 'express'
 import { check } from 'express-validator'
 import * as authController from './controllers/authController.js'
 import authMiddleware from './middleware/authMiddleware.js'
+import {addProductCart} from "./controllers/productController.js";
 
 const router = new Router()
 router.post(
@@ -17,5 +18,6 @@ router.post(
 )
 router.post('/login', authController.login)
 router.get('/users',authMiddleware, authController.getUsers)
+router.post('/user/:userId/cart/add', addProductCart)
 
 export default router
