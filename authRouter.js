@@ -1,8 +1,8 @@
 import Router from 'express'
 import { check } from 'express-validator'
-import * as authController from './controllers/authController.js'
 import authMiddleware from './middleware/authMiddleware.js'
-import {addProductCart} from "./controllers/productController.js";
+import {addCart, addFavorite, getProductFavorite} from './controllers/productController.js'
+import {getUsers, login, register} from "./controllers/authController.js";
 
 const router = new Router()
 router.post(
@@ -14,10 +14,12 @@ router.post(
       'Пароль должен быть больше 4 и меньше 10 символов'
     ).isLength({ min: 4, max: 10 }),
   ],
-  authController.register
+  register
 )
-router.post('/login', authController.login)
-router.get('/users',authMiddleware, authController.getUsers)
-router.post('/user/:userId/cart/add', addProductCart)
+router.post('/login', login)
+router.get('/users', getUsers)
+router.get('/user/:userId/favorite',authMiddleware, getProductFavorite)
+router.post('/user/:userId/favorite/add', addFavorite)
+router.post('/user/:userId/cart/add', addCart)
 
 export default router

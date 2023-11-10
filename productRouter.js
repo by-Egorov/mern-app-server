@@ -1,11 +1,11 @@
 import Router from 'express'
-import * as productController from './controllers/productController.js'
 import roleMiddleware from './middleware/roleMiddleware.js'
+import {addProduct, getProduct} from "./controllers/productController.js";
 
 const router = new Router()
 
-router.post('/add', roleMiddleware(['ADMIN']), productController.addProduct)
-router.post('/get', productController.getProduct)
+router.post('/add', roleMiddleware(['ADMIN']), addProduct)
+router.post('/get', getProduct)
 
 
 export default router

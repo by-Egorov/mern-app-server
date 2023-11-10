@@ -17,10 +17,15 @@ const server = express()
 
 server.use(express.json())
 server.use(corsMiddleware)
-server.use('/auth', authRouter)
+server.use('/api', authRouter)
 server.use('/product', productRouter)
 
-server.use(cors())
+server.use(cors({
+  origin: 'http://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  exposedHeaders: ['Authorization'],
+}))
 
 // запуск сервера
 server.listen(PORT, (er) => {

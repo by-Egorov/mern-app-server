@@ -61,6 +61,7 @@ export const login = async (req, res) => {
     const token = generateAccessToken(user._id, user.roles)
     const { passwordHash, ...userData } = user._doc
     res.json({
+      ...userData,
       token,
     })
     // return res.json({ token })

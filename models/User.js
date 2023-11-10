@@ -19,14 +19,6 @@ const UserSchema = new mongoose.Schema(
         ref: 'Role',
       },
     ],
-    cart: {
-        type: Array,
-        ref: 'Cart'
-    },
-    favorites: {
-        type: Array,
-        ref: 'Favorite'
-    },
   },
   {
     timestamps: true,
