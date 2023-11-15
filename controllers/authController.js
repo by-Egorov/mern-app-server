@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt'
 import { validationResult } from 'express-validator'
 import RoleSchema from '../models/Role.js'
 import UserSchema from '../models/User.js'
+import User from "../models/User.js";
+import Role from "../models/Role.js";
 
 const generateAccessToken = (id, roles) => {
   const payload = {
@@ -24,7 +26,7 @@ export const register = async (req, res) => {
     const salt = await bcrypt.genSalt(7)
     const hash = await bcrypt.hash(password, salt)
 
-    const userRole = await RoleSchema.findOne({ value: 'USER' })
+    const userRole = await Role.findOne({ value: 'USER' })
     const doc = new UserSchema({
       email: req.body.email,
       passwordHash: hash,
@@ -45,7 +47,7 @@ export const register = async (req, res) => {
 //Login
 export const login = async (req, res) => {
   try {
-    const user = await UserSchema.findOne({ email: req.body.email })
+    const user = await User.findOne({ email: req.body.email })
     if (!user) {
       return res
         .status(400)
@@ -75,9 +77,10 @@ export const login = async (req, res) => {
 // //Get user
 export const getUsers = async (req, res) => {
   try {
-    const users = await UserSchema.find()
+    const user = await User.find()
+    console.log(user)
+    return res.json({user})
 
-    return res.json({users})
   } catch (e) {
     console.log(e)
     res.status(400).json({
@@ -85,13 +88,26 @@ export const getUsers = async (req, res) => {
     })
   }
 }
+// export const getUser = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user.id)
+//     console.log(user)
+//     return res.json({user})
+
+//   } catch (e) {
+//     console.log(e)
+//     res.status(400).json({
+//       message: 'Get Users error',
+//     })
+//   }
+// }
 // Update
 export const updateUser = async (req, res) => {
   const { userId } = req.params
   const updatedUserData = req.body
   try {
     //Поиск пользователя по I'd
-    const user = await UserSchema.findByIdAndUpdate(userId, updatedUserData, {
+    const user = await User.findByIdAndUpdate(userId, updatedUserData, {
       new: true,
     })
     res.json(user)

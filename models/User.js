@@ -1,6 +1,4 @@
 import mongoose from 'mongoose'
-import CartSchema from './Cart.js'
-import FavoriteSchema from './Favorite.js'
 
 const UserSchema = new mongoose.Schema(
   {
@@ -17,6 +15,18 @@ const UserSchema = new mongoose.Schema(
       {
         type: String,
         ref: 'Role',
+      },
+    ],
+    favorite: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
+      },
+    ],
+    cart: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Product',
       },
     ],
   },
