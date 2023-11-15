@@ -1,11 +1,10 @@
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcrypt'
 import { validationResult } from 'express-validator'
-import RoleSchema from '../models/Role.js'
-import UserSchema from '../models/User.js'
 import User from "../models/User.js";
 import Role from "../models/Role.js";
 
+//Generate jwt token
 const generateAccessToken = (id, roles) => {
   const payload = {
     id,
@@ -13,8 +12,8 @@ const generateAccessToken = (id, roles) => {
   }
   return jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '24h' })
 }
-//Register
 
+//Register
 export const register = async (req, res) => {
   try {
     const errors = validationResult(req)
@@ -27,7 +26,7 @@ export const register = async (req, res) => {
     const hash = await bcrypt.hash(password, salt)
 
     const userRole = await Role.findOne({ value: 'USER' })
-    const doc = new UserSchema({
+    const doc = new User({
       email: req.body.email,
       passwordHash: hash,
       roles: [userRole.value],
@@ -44,6 +43,7 @@ export const register = async (req, res) => {
     })
   }
 }
+
 //Login
 export const login = async (req, res) => {
   try {
@@ -75,22 +75,9 @@ export const login = async (req, res) => {
   }
 }
 // //Get user
-export const getUsers = async (req, res) => {
-  try {
-    const user = await User.find()
-    console.log(user)
-    return res.json({user})
-
-  } catch (e) {
-    console.log(e)
-    res.status(400).json({
-      message: 'Get Users error',
-    })
-  }
-}
-// export const getUser = async (req, res) => {
+// export const getUsers = async (req, res) => {
 //   try {
-//     const user = await User.findById(req.user.id)
+//     const user = await User.find()
 //     console.log(user)
 //     return res.json({user})
 
@@ -101,18 +88,19 @@ export const getUsers = async (req, res) => {
 //     })
 //   }
 // }
+
 // Update
-export const updateUser = async (req, res) => {
-  const { userId } = req.params
-  const updatedUserData = req.body
-  try {
-    //Поиск пользователя по I'd
-    const user = await User.findByIdAndUpdate(userId, updatedUserData, {
-      new: true,
-    })
-    res.json(user)
-  } catch (err) {
-    console.error('Ошибка при обновлении данных пользователя:', error)
-    res.status(500).json({ error: 'Ошибка при обновлении данных пользователя' })
-  }
-}
+// export const updateUser = async (req, res) => {
+//   const { userId } = req.params
+//   const updatedUserData = req.body
+//   try {
+//     //Поиск пользователя по I'd
+//     const user = await User.findByIdAndUpdate(userId, updatedUserData, {
+//       new: true,
+//     })
+//     res.json(user)
+//   } catch (err) {
+//     console.error('Ошибка при обновлении данных пользователя:', error)
+//     res.status(500).json({ error: 'Ошибка при обновлении данных пользователя' })
+//   }
+// }

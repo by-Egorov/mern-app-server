@@ -25,7 +25,6 @@ app.use('/api', authRouter)
 app.get('/api/user/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
-    console.log(user)
     return res.json({user})
 
   } catch (e) {
