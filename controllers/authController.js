@@ -10,7 +10,7 @@ const generateAccessToken = (id, roles) => {
     id,
     roles,
   }
-  return jwt.sign(payload, 'secret123', { expiresIn: '24h' })
+  return jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '24h' })
 }
 
 //Register
