@@ -12,7 +12,8 @@ import roleMiddleware from './middleware/roleMiddleware.js'
 const PORT = process.env.PORT || 3001
 // Подключение к ДБ
 mongoose
-  .connect(process.env.MONGODB_URI)
+  .connect('mongodb+srv://egorovdev:devop@cluster0.5qqffmc.mongodb.net/egorov_db?retryWrites=true&w=majority')
+  
   .then(() => console.log('DB ok'))
   .catch(() => console.log('DB error', err))
 // Создание сервера
