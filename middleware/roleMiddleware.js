@@ -11,7 +11,7 @@ function roleMiddleware (roles) {
             if (!token) {
                 return res.status(403).json({ message: 'Пользователь не авторизован' })
             }
-            const {roles: userRoles} = jwt.verify(token, 'secret123')
+            const {roles: userRoles} = jwt.verify(token, process.env.SECRET_KEY)
             let hasRole = false
             userRoles.forEach(role => {
                 if(roles.includes(role)) {
