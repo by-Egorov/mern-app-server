@@ -9,10 +9,10 @@ import Product from './models/Product.js'
 import authMiddleware from './middleware/authMiddleware.js'
 import roleMiddleware from './middleware/roleMiddleware.js'
 
-const PORT = 5000 || 3001
+const PORT = process.env.PORT || 3001
 // Подключение к ДБ
 mongoose
-  .connect('mongodb+srv://egorovdev:devop@cluster0.5qqffmc.mongodb.net/egorov_db?retryWrites=true&w=majority')
+  .connect(process.env.MONGODB_URI)
   .then(() => console.log('DB ok'))
   .catch(() => console.log('DB error', err))
 // Создание сервера
