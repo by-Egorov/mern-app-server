@@ -7,6 +7,7 @@ import authRouter from './authRouter.js'
 import User from './models/User.js'
 import Product from './models/Product.js'
 import authMiddleware from './middleware/authMiddleware.js'
+import roleMiddleware from './middleware/roleMiddleware.js'
 
 const PORT = process.env.PORT || 3001
 // Подключение к ДБ
@@ -43,6 +44,30 @@ app.get('/api/products', async (req, res) => {
   } catch (error) {
     console.error('Ошибка при получении товаров:', error)
     res.status(500).json({ message: 'Произошла ошибка при получении товаров' })
+  }
+})
+
+// http://localhost:5000/api/products/add
+app.post('/api/products/add', roleMiddleware(["ADMIN"]), async (req, res) => {
+  try {
+    const { title, category, description, price, image } = req.body
+    const doc = new Product({
+      title,
+      category,
+      description,
+      price,
+      image,
+    })
+
+    const product = await doc.save()
+    const { ...productData } = product._doc
+    console.log('Продукт успешно добавлен')
+    res.status(200).json({ message: 'Продукт успешно добавлен' })
+  } catch (e) {
+    console.log(e)
+    res.status(400).json({
+      message: 'Added product error',
+    })
   }
 })
 

@@ -53,12 +53,17 @@ export const login = async (req, res) => {
         .status(400)
         .json({ message: 'Пользователь с таким email не найден' })
     }
+    if (user.email !== req.body.email) {
+      return res
+        .status(409)
+        .json({ message: 'Не верные данные, повторите ввод' })
+    }
     const isValidPass = await bcrypt.compare(
       req.body.password,
       user._doc.passwordHash
     )
     if (!isValidPass) {
-      return res.status(400).json({ message: 'Введен неверный пароль' })
+      return res.status(401).json({ message: 'Введен неверный пароль' })
     }
     const token = generateAccessToken(user._id, user.roles)
     const { passwordHash, ...userData } = user._doc
