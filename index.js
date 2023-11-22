@@ -23,8 +23,8 @@ app.use(express.json())
 app.use(corsMiddleware)
 app.use('/api', authRouter)
 
-// http://localhost:5000/api/user/me
-app.get('/api/user/me', authMiddleware, async (req, res) => {
+// http://localhost:5000/api/users/me
+app.get('/api/users/me', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
     return res.json({ user })
@@ -49,50 +49,8 @@ app.get('/api/products', async (req, res) => {
   }
 })
 
-// http://localhost:5000/api/products/:id
-// app.get('/api/products/:id', async (req, res) => {
-//   try {
-//     const product = await Product.findById(req.params.id)
-//     res.json({ product })
-//   } catch (error) {
-//     console.error('Ошибка при получении продукта:', error)
-//     res.status(500).json({ message: 'Произошла ошибка при получении продукта' })
-//   }
-// })
-
-// http://localhost:5000/api/products/:id
-// app.delete('/api/products/cart/delete', authMiddleware, async (req, res) => {
-//   try {
-//     const productId = req.body.productId
-//     const userId = req.user.id
-//     const user = await User.findById(userId)
-//     console.log(user)
-
-//     if (!user) {
-//       console.log('Пользователь не найден')
-//       return res.status(404).json({ message: 'Пользователь не найден' })
-//     }
-
-//     const product = await Product.findById(productId)
-//     console.log(product)
-//     if (!product) {
-//       return res.json({ message: 'Такого продукта не существует' })
-//     }
-//     await User.findByIdAndUpdate(
-//       user._id,
-//       {
-//         $pull: { cart: product._id },
-//       },
-//       { new: true }
-//     )
-//   } catch (error) {
-//     console.error('Ошибка удаления продукта:', error)
-//     res.status(500).json({ message: 'Произошла ошибка удаления продукта' })
-//   }
-// })
-
-// http://localhost:5000/api/products/add
-app.post('/api/products/add', roleMiddleware(['ADMIN']), async (req, res) => {
+// http://localhost:5000/api/products
+app.post('/api/products', roleMiddleware(['ADMIN']), async (req, res) => {
   try {
     const { title, category, description, price, image } = req.body
     const doc = new Product({
@@ -115,8 +73,8 @@ app.post('/api/products/add', roleMiddleware(['ADMIN']), async (req, res) => {
   }
 })
 
-// http://localhost:5000/api/products/favorite
-app.get('/api/products/favorite', authMiddleware, async (req, res) => {
+// http://localhost:5000/api/favorites
+app.get('/api/favorites', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
     const list = await Promise.all(
@@ -134,8 +92,8 @@ app.get('/api/products/favorite', authMiddleware, async (req, res) => {
   }
 })
 
-// http://localhost:5000/api/products/cart
-app.get('/api/products/cart', authMiddleware, async (req, res) => {
+// http://localhost:5000/api/cart
+app.get('/api/cart', authMiddleware, async (req, res) => {
   try {
     const user = await User.findById(req.user.id)
     const list = await Promise.all(
@@ -152,8 +110,8 @@ app.get('/api/products/cart', authMiddleware, async (req, res) => {
   }
 })
 
-// http://localhost:5000/api/products/favorite/add
-app.post('/api/products/favorite/add', authMiddleware, async (req, res) => {
+// http://localhost:5000/api/favorites/add
+app.post('/api/favorites/add', authMiddleware, async (req, res) => {
   try {
     const productId = req.body.productId
     const userId = req.user.id
@@ -188,8 +146,8 @@ app.post('/api/products/favorite/add', authMiddleware, async (req, res) => {
   }
 })
 
-// http://localhost:5000/api/products/cart/add
-app.post('/api/products/cart/add', authMiddleware, async (req, res) => {
+// http://localhost:5000/api/cart/add
+app.post('/api/cart/add', authMiddleware, async (req, res) => {
   try {
     const productId = req.body.productId
     const userId = req.user.id
@@ -224,39 +182,67 @@ app.post('/api/products/cart/add', authMiddleware, async (req, res) => {
   }
 })
 
-// http://localhost:5000/api/products/cart/delete
-app.delete('/api/products/cart/delete', authMiddleware, async (req, res) => {
+// http://localhost:5000/api/cart/remove
+app.delete(
+  '/api/cart/remove',
+  authMiddleware,
+  async (req, res) => {
+    try {
+      const userId = req.user.id
+      const productId = req.body.productId
+
+      // Найдем пользователя по идентификатору
+      const user = await User.findById(userId)
+
+      // Найдем индекс продукта в корзине
+      const productIndex = user.cart.findIndex(
+        (item) => item.toString() === productId
+      )
+
+      if (productIndex !== -1) {
+        // Удалим продукт из корзины
+        user.cart.splice(productIndex, 1)
+
+        // Сохраняем обновленные данные пользователя
+        await user.save()
+
+        // Получаем обновленный список продуктов в корзине
+        const updatedCart = await Promise.all(
+          user.cart.map(async (productId) => {
+            return await Product.findById(productId)
+          })
+        )
+
+        return res.json({ cart: updatedCart })
+      } else {
+        return res.status(404).json({ message: 'Продукт не найден в корзине' })
+      }
+    } catch (error) {
+      console.error('Ошибка при удалении продукта из корзины:', error)
+      res
+        .status(500)
+        .json({ message: 'Произошла ошибка при удалении продукта из корзины' })
+    }
+  }
+)
+
+// http://localhost:5000/api/products/:id
+app.get('/api/products/:id', async (req, res) => {
   try {
-    const productId = req.body.productId
-    const userId = req.user.id
-    const user = await User.findById(userId)
+    const productId = req.params.id
 
-    if (!user) {
-      console.log('Пользователь не найден')
-      return res.status(404).json({ message: 'Пользователь не найден' })
+    if (productId.toLowerCase() === 'favorite') {
+      const favoriteProducts = await getFavoriteProducts()
+      return res.json({ products: favoriteProducts })
+
     }
-
+    console.log(productId)
     const product = await Product.findById(productId)
-
-    if (!product) {
-      console.log('Продукт не найден')
-      return res.status(404).json({ message: 'Продукт не найден' })
-    }
-
-    await User.findByIdAndUpdate(
-      user._id,
-      {
-        $pull: { cart: product._id },
-      },
-      { new: true }
-    )
-    console.log('Продукт успешно добавлен в корзину')
-    res.status(200).json({ message: 'Продукт успешно добавлен в корзину' })
+    console.log(product)
+    res.json({ product })
   } catch (error) {
-    console.error('Ошибка при добавлении продукта в корзину:', error)
-    res
-      .status(500)
-      .json({ message: 'Произошла ошибка при добавлении продукта в корзину' })
+    console.error('Ошибка при получении продукта:', error)
+    res.status(500).json({ message: 'Произошла ошибка при получении продукта' })
   }
 })
 

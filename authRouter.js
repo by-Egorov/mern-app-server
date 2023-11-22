@@ -9,7 +9,7 @@ import {
 
 const router = new Router()
 router.post(
-  '/user/register',
+  '/users/register',
   [
     check('email', 'Поле email не может быть пустым').notEmpty(),
     check(
@@ -20,7 +20,7 @@ router.post(
   register
 )
 router.post(
-  '/user/login',
+  '/users/login',
   [
     check('email', 'Поле email не может быть пустым').notEmpty(),
     check(

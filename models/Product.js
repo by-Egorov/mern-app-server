@@ -21,6 +21,13 @@ const ProductSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  count: {
+    type: Number,
+    default: 1
+  },
+  favorit: {
+    type: Boolean
+  }
 })
 
 export default mongoose.model('Product', ProductSchema)
