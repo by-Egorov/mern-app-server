@@ -25,7 +25,7 @@ const ProductSchema = new mongoose.Schema({
     type: Number,
     default: 1
   },
-  favorit: {
+  favorite: {
     type: Boolean
   }
 })
