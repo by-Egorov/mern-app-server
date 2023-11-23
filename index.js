@@ -249,7 +249,6 @@ app.patch('/api/product/:id', authMiddleware, async (req, res) => {
       },
       {
       favorite: req.body.favorite,
-      price: req.body.price
       }
     )
 
