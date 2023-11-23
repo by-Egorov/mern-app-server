@@ -248,7 +248,7 @@ app.patch('/api/products/:id', authMiddleware, async (req, res) => {
         _id: productId,
       },
       {
-      favorite: req.body.favorite,
+      favorite: true,
       }
     )
 
