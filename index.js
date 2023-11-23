@@ -240,7 +240,7 @@ app.get('/api/products/:id', async (req, res) => {
   }
 })
 
-app.patch('/api/product/:id', authMiddleware, async (req, res) => {
+app.patch('/api/products/:id', authMiddleware, async (req, res) => {
   try {
     const productId = req.params.id
     await Product.updateOne(
