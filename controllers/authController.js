@@ -79,33 +79,19 @@ export const login = async (req, res) => {
     })
   }
 }
-// //Get user
-// export const getUsers = async (req, res) => {
-//   try {
-//     const user = await User.find()
-//     console.log(user)
-//     return res.json({user})
 
-//   } catch (e) {
-//     console.log(e)
-//     res.status(400).json({
-//       message: 'Get Users error',
-//     })
-//   }
-// }
-
-// Update
-// export const updateUser = async (req, res) => {
-//   const { userId } = req.params
-//   const updatedUserData = req.body
-//   try {
-//     //Поиск пользователя по I'd
-//     const user = await User.findByIdAndUpdate(userId, updatedUserData, {
-//       new: true,
-//     })
-//     res.json(user)
-//   } catch (err) {
-//     console.error('Ошибка при обновлении данных пользователя:', error)
-//     res.status(500).json({ error: 'Ошибка при обновлении данных пользователя' })
-//   }
-// }
+//Update
+export const updateUser = async (req, res) => {
+  const { userId } = req.params
+  const updatedUserData = req.body
+  try {
+    //Поиск пользователя по I'd
+    const user = await User.findByIdAndUpdate(userId, updatedUserData, {
+      new: true,
+    })
+    res.json(user)
+  } catch (err) {
+    console.error('Ошибка при обновлении данных пользователя:', error)
+    res.status(500).json({ error: 'Ошибка при обновлении данных пользователя' })
+  }
+}

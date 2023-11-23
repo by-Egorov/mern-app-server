@@ -73,6 +73,8 @@ app.post('/api/products', roleMiddleware(['ADMIN']), async (req, res) => {
   }
 })
 
+
+
 // http://localhost:5000/api/favorites
 app.get('/api/favorites', authMiddleware, async (req, res) => {
   try {
@@ -183,48 +185,41 @@ app.post('/api/cart/add', authMiddleware, async (req, res) => {
 })
 
 // http://localhost:5000/api/cart/remove
-app.delete(
-  '/api/cart/remove',
-  authMiddleware,
-  async (req, res) => {
-    try {
-      const userId = req.user.id
-      const productId = req.body.productId
+app.delete('/api/cart/remove', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id
+    const productId = req.body.productId
 
-      // Найдем пользователя по идентификатору
-      const user = await User.findById(userId)
+    // Найдем пользователя по идентификатору
+    const user = await User.findById(userId)
 
-      // Найдем индекс продукта в корзине
-      const productIndex = user.cart.findIndex(
-        (item) => item.toString() === productId
+    // Найдем индекс продукта в корзине
+    const productIndex = user.cart.findIndex(
+      (item) => item.toString() === productId
+    )
+
+    if (productIndex !== -1) {
+      user.cart.splice(productIndex, 1)
+
+      await user.save()
+
+      const updatedCart = await Promise.all(
+        user.cart.map(async (productId) => {
+          return await Product.findById(productId)
+        })
       )
 
-      if (productIndex !== -1) {
-        // Удалим продукт из корзины
-        user.cart.splice(productIndex, 1)
-
-        // Сохраняем обновленные данные пользователя
-        await user.save()
-
-        // Получаем обновленный список продуктов в корзине
-        const updatedCart = await Promise.all(
-          user.cart.map(async (productId) => {
-            return await Product.findById(productId)
-          })
-        )
-
-        return res.json({ cart: updatedCart })
-      } else {
-        return res.status(404).json({ message: 'Продукт не найден в корзине' })
-      }
-    } catch (error) {
-      console.error('Ошибка при удалении продукта из корзины:', error)
-      res
-        .status(500)
-        .json({ message: 'Произошла ошибка при удалении продукта из корзины' })
+      return res.json({ cart: updatedCart })
+    } else {
+      return res.status(404).json({ message: 'Продукт не найден в корзине' })
     }
+  } catch (error) {
+    console.error('Ошибка при удалении продукта из корзины:', error)
+    res
+      .status(500)
+      .json({ message: 'Произошла ошибка при удалении продукта из корзины' })
   }
-)
+})
 
 // http://localhost:5000/api/products/:id
 app.get('/api/products/:id', async (req, res) => {
@@ -234,7 +229,6 @@ app.get('/api/products/:id', async (req, res) => {
     if (productId.toLowerCase() === 'favorite') {
       const favoriteProducts = await getFavoriteProducts()
       return res.json({ products: favoriteProducts })
-
     }
     console.log(productId)
     const product = await Product.findById(productId)
@@ -243,6 +237,28 @@ app.get('/api/products/:id', async (req, res) => {
   } catch (error) {
     console.error('Ошибка при получении продукта:', error)
     res.status(500).json({ message: 'Произошла ошибка при получении продукта' })
+  }
+})
+
+app.patch('/api/product/:id', authMiddleware, async (req, res) => {
+  try {
+    const productId = req.params.id
+    await Product.updateOne(
+      {
+        _id: productId,
+      },
+      {
+      favorite: req.body.favorite,
+      price: req.body.price
+      }
+    )
+
+    res.json({
+      success: true,
+    })
+  } catch (err) {
+    console.error('Ошибка при обновлении данных пользователя:', error)
+    res.status(500).json({ error: 'Ошибка при обновлении данных пользователя' })
   }
 })
 

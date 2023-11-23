@@ -26,7 +26,8 @@ const ProductSchema = new mongoose.Schema({
     default: 1
   },
   favorite: {
-    type: Boolean
+    type: Boolean,
+    default: false
   }
 })
 
