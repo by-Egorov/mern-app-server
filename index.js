@@ -73,8 +73,6 @@ app.post('/api/products', roleMiddleware(['ADMIN']), async (req, res) => {
   }
 })
 
-
-
 // http://localhost:5000/api/favorites
 app.get('/api/favorites', authMiddleware, async (req, res) => {
   try {
@@ -240,26 +238,23 @@ app.get('/api/products/:id', async (req, res) => {
   }
 })
 
-app.patch('/api/products/:id', authMiddleware, async (req, res) => {
+app.patch('/api/product', authMiddleware, async (req, res) => {
   try {
-    const productId = req.params.id
-    await Product.updateOne(
-      {
-        _id: productId,
-      },
-      {
-      favorite: true,
-      }
-    )
-
-    res.json({
-      success: true,
+    const { productId, favorite } = req.body
+    const updatedProduct = await Product.findByIdAndUpdate(productId, {
+      favorite: favorite,
     })
+    if (!updatedProduct) {
+      return res.status(404).json({ error: 'Product not found' })
+    }
+
+    res.json(updatedProduct)
   } catch (err) {
     console.error('Ошибка при обновлении данных пользователя:', error)
     res.status(500).json({ error: 'Ошибка при обновлении данных пользователя' })
   }
 })
+
 
 app.use(cors())
 
