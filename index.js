@@ -182,6 +182,41 @@ app.post('/api/cart/add', authMiddleware, async (req, res) => {
   }
 })
 
+app.delete('/api/favorite/remove', authMiddleware, async (req, res) => {
+  try {
+    const userId = req.user.id
+    const productId = req.body.productId
+
+   
+    const user = await User.findById(userId)
+
+    const productIndex = user.favorite.findIndex(
+      (item) => item.toString() === productId
+    )
+
+    if (productIndex !== -1) {
+      user.favorite.splice(productIndex, 1)
+
+      await user.save()
+
+      const updatedFavorite = await Promise.all(
+        user.favorite.map(async (productId) => {
+          return await Product.findById(productId)
+        })
+      )
+
+      return res.json({ favorite: updatedFavorite })
+    } else {
+      return res.status(404).json({ message: 'Продукт не найден в избранном' })
+    }
+  } catch (error) {
+    console.error('Ошибка при удалении продукта из избранного:', error)
+    res
+      .status(500)
+      .json({ message: 'Произошла ошибка при удалении продукта из избранного' })
+  }
+})
+
 // http://localhost:5000/api/cart/remove
 app.delete('/api/cart/remove', authMiddleware, async (req, res) => {
   try {
