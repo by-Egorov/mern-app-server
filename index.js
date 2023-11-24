@@ -275,9 +275,9 @@ app.get('/api/products/:id', async (req, res) => {
 
 app.patch('/api/product', authMiddleware, async (req, res) => {
   try {
-    const { productId, favorite } = req.body
-    const updatedProduct = await Product.findByIdAndUpdate(productId, {
-      favorite: favorite,
+    const { productId, updates } = req.body
+    const updatedProduct = await Product.findByIdAndUpdate(productId, updates, {
+      new: true
     })
     if (!updatedProduct) {
       return res.status(404).json({ error: 'Product not found' })
