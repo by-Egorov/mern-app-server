@@ -52,12 +52,13 @@ app.get('/api/products', async (req, res) => {
 // http://localhost:5000/api/products
 app.post('/api/products', roleMiddleware(['ADMIN']), async (req, res) => {
   try {
-    const { title, category, description, price, image } = req.body
+    const { title, category, description, price, totalPrice, image } = req.body
     const doc = new Product({
       title,
       category,
       description,
       price,
+      totalPrice,
       image,
     })
 
